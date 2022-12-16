@@ -91,11 +91,12 @@ def load_state_dict(checkpoint_file: Union[str, os.PathLike]):
     """
     Reads a checkpoint file, returning properly formatted errors if they arise.
     """
+    target_device = "cuda:0" if os.getenv("SAFETENSORS_LOAD_TO_GPU") else "cpu"
     try:
         if os.path.basename(checkpoint_file) == WEIGHTS_NAME:
-            return torch.load(checkpoint_file, map_location="cuda:0")
+            return torch.load(checkpoint_file, map_location=target_device)
         else:
-            return safetensors.torch.load_file(checkpoint_file, device="cuda:0")
+            return safetensors.torch.load_file(checkpoint_file, device=target_device)
     except Exception as e:
         try:
             with open(checkpoint_file) as f:
